@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "filemoon-production.up.railway.app/api",
+  baseURL: "https://filemoon-production.up.railway.app/api",
   withCredentials: true,
 });
 
