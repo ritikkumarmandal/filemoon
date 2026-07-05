@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:5003/api",
+  baseURL: "https://filemoon-production.up.railway.app/api",
   withCredentials: true,
 });
