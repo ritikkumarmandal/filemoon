@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+
+  role          Role           @default(USER)
+
+  isVerified    Boolean        @default(false)
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  files         File[]
+  refreshTokens RefreshToken[]
+}
+
+model File {
+  id          String      @id @default(cuid())
+
+  fileName    String
+  originalName String
+  fileType    String
+  fileSize    Int
+
+  storageKey  String
+  fileUrl     String
+
+  uploadedById String
+  uploadedBy   User @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  isDeleted   Boolean @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sharedLinks SharedFile[]
+}
+
+model SharedFile {
+  id          String   @id @default(cuid())
+
+  token       String   @unique
+
+  email       String?
+
+  expiresAt   DateTime?
+
+  downloads   Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  fileId       String
+  file         File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+
+  token       String   @unique
+
+  expiresAt   DateTime
+
+  createdAt   DateTime @default(now())
+
+  userId       String
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
