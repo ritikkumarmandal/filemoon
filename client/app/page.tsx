@@ -1,82 +1,46 @@
 "use client";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import Background from "@/components/Background";
+import Stats from "@/components/Stats";
+import Features from "@/components/Features";
+import Footer from "@/components/Footer";
+import UploadBox from "@/components/UploadBox";
+import TransferForm from "@/components/TransferForm";
+import { useState } from "react";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { registerSchema } from "@/lib/validators/auth";
-import { registerUser } from "@/services/auth";
-import { useRouter } from "next/navigation";
-
-export default function HomePage() {
-  const router = useRouter();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(registerSchema),
-  });
-
-  const onSubmit = async (data: any) => {
-    try {
-      await registerUser(data);
-      router.push("/login");
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+export default function Home() {
+   const [files, setFiles] = useState<File[]>([]);
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-50">
+    <main className="hero-bg">
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-96 p-6 shadow-lg rounded-lg bg-white space-y-4"
-      >
+      <Background />
 
-        <h1 className="text-2xl font-bold text-center">
-          Create Account 🚀
-        </h1>
+      <Navbar />
 
-        <input
-          placeholder="Name"
-          {...register("name")}
-          className="border p-2 w-full rounded"
+      <Hero />
+       {files.length === 0 ? (
+
+        <UploadBox
+          onNext={(selectedFiles) =>
+            setFiles(selectedFiles)
+          }
         />
-        <p className="text-red-500 text-sm">{errors.name?.message}</p>
 
-        <input
-          placeholder="Email"
-          {...register("email")}
-          className="border p-2 w-full rounded"
-        />
-        <p className="text-red-500 text-sm">{errors.email?.message}</p>
+      ) : (
 
-        <input
-          type="password"
-          placeholder="Password"
-          {...register("password")}
-          className="border p-2 w-full rounded"
-        />
-        <p className="text-red-500 text-sm">{errors.password?.message}</p>
+        <TransferForm files={files} />
 
-        <button
-          disabled={isSubmitting}
-          className="bg-blue-600 text-white w-full p-2 rounded hover:bg-blue-700"
-        >
-          {isSubmitting ? "Creating..." : "Sign Up"}
-        </button>
+      )}
 
-        <p className="text-center text-sm">
-          Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 font-medium">
-            Login
-          </Link>
-        </p>
+    
 
-      </form>
+      <Stats />
 
-    </div>
+      <Features />
+
+      <Footer />
+
+    </main>
   );
 }

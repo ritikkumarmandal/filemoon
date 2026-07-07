@@ -9,6 +9,7 @@ import adminRoutes from "./routes/admin.routes";
 import path from "path";
 import fileRoutes from "./routes/file.routes";
 import publicRoutes from "./routes/public.routes";
+import transferRoutes from "./routes/transfer.routes";
 
 const app = express();
 
@@ -32,4 +33,6 @@ app.use(
 );
 app.use("/api/files", fileRoutes);
 app.use("/api", publicRoutes);
+
+app.use("/api/transfer", transferRoutes);
 export default app;

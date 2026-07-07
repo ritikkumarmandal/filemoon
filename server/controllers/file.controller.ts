@@ -3,17 +3,31 @@ import fileService from "../services/file.service";
 
 class FileController {
   async upload(req: Request, res: Response, next: NextFunction) {
-    try {
-      if (!req.file) throw new Error("No file uploaded");
+  try {
 
-      const file = await fileService.upload(req.file, req.user!.id);
+     console.log("BODY:", req.body);
+    console.log("FILES:", req.files);
 
-      res.json({ success: true, data: file });
-    } catch (err) {
-      next(err);
+    const files = req.files as Express.Multer.File[];
+
+    if (!files || files.length === 0) {
+      throw new Error("No files uploaded");
     }
-  }
 
+    const uploadedFiles = await Promise.all(
+      files.map((file) =>
+        fileService.upload(file, req.user!.id)
+      )
+    );
+
+    return res.status(201).json({
+      success: true,
+      data: uploadedFiles,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
   async getMyFiles(req: Request, res: Response, next: NextFunction) {
     try {
       const files = await fileService.getUserFiles(req.user!.id);

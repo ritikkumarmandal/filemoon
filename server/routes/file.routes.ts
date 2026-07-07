@@ -8,7 +8,7 @@ const router = Router();
 router.post(
   "/upload",
   protect,
-  upload.single("file"),
+  upload.array("files", 100),
   fileController.upload
 );
 router.get("/", protect, fileController.getMyFiles);

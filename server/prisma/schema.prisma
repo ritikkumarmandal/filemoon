@@ -18,70 +18,114 @@ enum Role {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
-  password      String
+  id       String @id @default(cuid())
+  name     String
+  email    String @unique
+  password String
 
-  role          Role           @default(USER)
+  role Role @default(USER)
 
-  isVerified    Boolean        @default(false)
+  isVerified Boolean @default(false)
 
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   files         File[]
   refreshTokens RefreshToken[]
 }
 
 model File {
-  id          String      @id @default(cuid())
+  id String @id @default(cuid())
 
-  fileName    String
+  fileName     String
   originalName String
-  fileType    String
-  fileSize    Int
+  fileType     String
+  fileSize     Int
 
-  storageKey  String
-  fileUrl     String
+  storageKey String
+  fileUrl    String
 
   uploadedById String
-  uploadedBy   User @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
 
-  isDeleted   Boolean @default(false)
+  isDeleted Boolean @default(false)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   sharedLinks SharedFile[]
+
+  transfers TransferFile[]
 }
 
 model SharedFile {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  token       String   @unique
+  token String @unique
 
-  email       String?
+  email String?
 
-  expiresAt   DateTime?
+  expiresAt DateTime?
 
-  downloads   Int      @default(0)
+  downloads Int @default(0)
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  fileId       String
-  file         File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId String
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  token       String   @unique
+  token String @unique
 
-  expiresAt   DateTime
+  expiresAt DateTime
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  userId       String
-  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Transfer {
+  id String @id @default(cuid())
+
+  token String @unique
+
+  senderName String
+
+  senderEmail String
+
+  receiverName String?
+
+  receiverEmail String
+
+  subject String?
+
+  message String?
+
+  status String @default("PENDING")
+
+  expiresAt DateTime?
+
+  downloadCount Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  files TransferFile[]
+}
+
+model TransferFile {
+  id String @id @default(cuid())
+
+  transferId String
+  fileId     String
+
+  transfer Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  file     File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@unique([transferId, fileId])
 }
