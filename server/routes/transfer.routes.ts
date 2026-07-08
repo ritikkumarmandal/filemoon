@@ -7,12 +7,14 @@ const router = Router();
 router.post("/", transferController.createTransfer);
 
 // Get Transfer Details
-router.get("/:token", transferController.getTransfer);
-
-// Download Transfer
 router.get(
   "/download/:token",
   transferController.downloadTransfer
+);
+
+router.get(
+  "/:token",
+  transferController.getTransfer
 );
 
 export default router;

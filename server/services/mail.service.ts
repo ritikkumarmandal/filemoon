@@ -2,16 +2,16 @@ import nodemailer from "nodemailer";
 
 class MailService {
   private transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST,
-    port: Number(process.env.MAIL_PORT),
-    secure: false,
+    host: process.env.MAIL_HOST || "smtp.gmail.com",
+    port: Number(process.env.MAIL_PORT) || 587,
+    secure: Number(process.env.MAIL_PORT) === 465,
+ // Force IPv4
     auth: {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
   });
 
-  // Common Mail Function
   async sendMail(
     to: string,
     subject: string,
@@ -25,7 +25,6 @@ class MailService {
     });
   }
 
-  // Receiver Email
   async sendTransferMail(
     receiverEmail: string,
     senderName: string,
@@ -37,64 +36,37 @@ class MailService {
       receiverEmail,
       subject || `${senderName} sent you files`,
       `
-      <div style="max-width:650px;margin:auto;padding:40px;font-family:Arial,sans-serif;background:#f8fafc;border-radius:16px">
+      <div style="font-family:Arial;padding:30px">
+        <h2>📦 FileMoon</h2>
 
-        <h1 style="color:#2563eb;margin-bottom:10px;">
-          📦 FileMoon
-        </h1>
+        <p><b>${senderName}</b> sent you files.</p>
 
-        <h2>You received files!</h2>
+        ${message ? `<p>${message}</p>` : ""}
 
-        <p>
-          <strong>${senderName}</strong> has sent you files.
-        </p>
-
-        ${
-          message
-            ? `
-          <div style="background:white;padding:20px;border-radius:10px;border:1px solid #ddd;margin:20px 0;">
-            ${message}
-          </div>
-        `
-            : ""
-        }
+        <br>
 
         <a
           href="${downloadLink}"
           style="
-            display:inline-block;
-            padding:15px 30px;
             background:#2563eb;
             color:white;
+            padding:14px 30px;
             text-decoration:none;
-            border-radius:10px;
-            font-size:16px;
-            font-weight:bold;
+            border-radius:8px;
+            display:inline-block;
           "
         >
           Download Files
         </a>
 
-        <p style="margin-top:30px;font-size:13px;color:#666;">
-          If the button doesn't work, copy this link:
-        </p>
+        <br><br>
 
-        <p style="word-break:break-all;">
-          ${downloadLink}
-        </p>
-
-        <hr style="margin:30px 0"/>
-
-        <p style="font-size:12px;color:#999;">
-          © FileMoon
-        </p>
-
+        <small>${downloadLink}</small>
       </div>
       `
     );
   }
 
-  // Sender Confirmation Email
   async sendConfirmationMail(
     senderEmail: string,
     senderName: string,
@@ -103,58 +75,37 @@ class MailService {
   ) {
     return this.sendMail(
       senderEmail,
-      "✅ Your File Transfer is Ready",
+      "Your File Transfer is Ready",
       `
-      <div style="max-width:650px;margin:auto;padding:40px;font-family:Arial,sans-serif;background:#f8fafc;border-radius:16px">
+      <div style="font-family:Arial;padding:30px">
 
-        <h1 style="color:#2563eb;">
-          🚀 FileMoon
-        </h1>
+        <h2>✅ Transfer Created</h2>
 
-        <h2>Hello ${senderName},</h2>
+        <p>Hello ${senderName},</p>
+
+        <p>Your files were sent successfully.</p>
 
         <p>
-          Your transfer has been created successfully.
+          <b>Receiver:</b> ${receiverEmail}
         </p>
-
-        <table style="margin-top:20px;">
-          <tr>
-            <td><strong>Receiver:</strong></td>
-            <td>${receiverEmail}</td>
-          </tr>
-        </table>
-
-        <br/>
 
         <a
           href="${downloadLink}"
           style="
-            display:inline-block;
-            padding:15px 30px;
             background:#16a34a;
             color:white;
+            padding:14px 30px;
             text-decoration:none;
-            border-radius:10px;
-            font-size:16px;
-            font-weight:bold;
+            border-radius:8px;
+            display:inline-block;
           "
         >
           Open Transfer
         </a>
 
-        <p style="margin-top:30px;font-size:13px;color:#666;">
-          Share Link:
-        </p>
+        <br><br>
 
-        <p style="word-break:break-all;">
-          ${downloadLink}
-        </p>
-
-        <hr style="margin:30px 0"/>
-
-        <p style="font-size:12px;color:#999;">
-          Thank you for using FileMoon ❤️
-        </p>
+        <small>${downloadLink}</small>
 
       </div>
       `
