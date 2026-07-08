@@ -1,6 +1,13 @@
 import nodemailer from "nodemailer";
+console.log({
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
+  user: process.env.MAIL_USER,
+});
 class MailService {
+  
 private transporter = nodemailer.createTransport({
+
   host: process.env.MAIL_HOST,
   port: Number(process.env.MAIL_PORT),
   secure: false,
